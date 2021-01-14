@@ -7,15 +7,31 @@ import javax.persistence.EntityManager;
 import it.manytomanyjpamaven.dao.EntityManagerUtil;
 import it.manytomanyjpamaven.dao.RuoloDAO;
 import it.manytomanyjpamaven.model.Ruolo;
+import it.manytomanyjpamaven.model.Utente;
 
 public class RuoloServiceImpl implements RuoloService {
 
 	private RuoloDAO ruoloDAO;
 
+	private UtenteService utenteServiceInstance = MyServiceFactory.getUtenteServiceInstance(); 
+	
 	@Override
 	public List<Ruolo> listAll() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		EntityManager entityManager = EntityManagerUtil.getEntityManager();
+
+		try {
+			// uso l'injection per il dao
+			ruoloDAO.setEntityManager(entityManager);
+
+			// eseguo quello che realmente devo fare
+			return ruoloDAO.list();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			entityManager.close();
+		}
 	}
 
 	@Override
@@ -40,8 +56,24 @@ public class RuoloServiceImpl implements RuoloService {
 
 	@Override
 	public void aggiorna(Ruolo ruoloInstance) throws Exception {
-		// TODO Auto-generated method stub
+		EntityManager entityManager = EntityManagerUtil.getEntityManager();
 
+		try {
+			// questo è come il MyConnection.getConnection()
+			entityManager.getTransaction().begin();
+
+			// uso l'injection per il dao
+			ruoloDAO.setEntityManager(entityManager);
+
+			// eseguo quello che realmente devo fare
+			ruoloDAO.update(ruoloInstance);
+
+			entityManager.getTransaction().commit();
+		} catch (Exception e) {
+			entityManager.getTransaction().rollback();
+			e.printStackTrace();
+			throw e;
+		}
 	}
 
 	@Override
@@ -70,8 +102,29 @@ public class RuoloServiceImpl implements RuoloService {
 
 	@Override
 	public void rimuovi(Ruolo ruoloInstance) throws Exception {
-		// TODO Auto-generated method stub
+		EntityManager entityManager = EntityManagerUtil.getEntityManager();
 
+		try {
+			
+			entityManager.getTransaction().begin();
+
+			ruoloDAO.setEntityManager(entityManager);
+
+			List<Utente> listaUtentiDb = utenteServiceInstance.cercaUtentiPerRuolo(ruoloInstance);
+			if(!listaUtentiDb.isEmpty())
+				for (Utente utenteItem : listaUtentiDb) {
+					utenteItem.setRuoli(null);
+					utenteServiceInstance.aggiorna(utenteItem);
+				}
+			
+			ruoloDAO.delete(ruoloInstance);
+
+			entityManager.getTransaction().commit();
+		} catch (Exception e) {
+			entityManager.getTransaction().rollback();
+			e.printStackTrace();
+			throw e;
+		}
 	}
 
 	@Override

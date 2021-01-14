@@ -108,8 +108,21 @@ public class UtenteServiceImpl implements UtenteService {
 
 	@Override
 	public void rimuovi(Utente utenteInstance) throws Exception {
-		// TODO Auto-generated method stub
+		EntityManager entityManager = EntityManagerUtil.getEntityManager();
 
+		try {
+			entityManager.getTransaction().begin();
+
+			utenteDAO.setEntityManager(entityManager);
+
+			utenteDAO.delete(utenteInstance);
+
+			entityManager.getTransaction().commit();
+		} catch (Exception e) {
+			entityManager.getTransaction().rollback();
+			e.printStackTrace();
+			throw e;
+		}
 	}
 
 	@Override
@@ -140,6 +153,26 @@ public class UtenteServiceImpl implements UtenteService {
 			entityManager.getTransaction().rollback();
 			e.printStackTrace();
 			throw e;
+		}
+
+	}
+	
+	@Override
+	public List<Utente> cercaUtentiPerRuolo(Ruolo ruoloInput) {
+		EntityManager entityManager = EntityManagerUtil.getEntityManager();
+
+		try {
+			// uso l'injection per il dao
+			utenteDAO.setEntityManager(entityManager);
+
+			// eseguo quello che realmente devo fare
+			return utenteDAO.findAllByRuolo(ruoloInput);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			entityManager.close();
 		}
 
 	}

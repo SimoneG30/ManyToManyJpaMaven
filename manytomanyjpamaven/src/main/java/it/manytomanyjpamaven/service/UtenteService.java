@@ -20,7 +20,10 @@ public interface UtenteService  {
 	
 	public void aggiungiRuolo(Utente utenteEsistente, Ruolo ruoloInstance) throws Exception;
 
+	public List<Utente> cercaUtentiPerRuolo(Ruolo ruoloInput);
+
 	//per injection
 	public void setUtenteDAO(UtenteDAO utenteDAO);
+
 
 }

@@ -60,11 +60,11 @@ public class ManyToManyTest {
 			
 			
 			
-//			System.out.println("\n RIMOZIONE RUOLO \n ");
-//			Ruolo ruoloDaDb2 = ruoloServiceInstance.caricaSingoloElemento(6L);
-//			if (ruoloDaDb2 != null) {
-//				ruoloServiceInstance.rimuovi(ruoloDaDb2);
-//			}
+			System.out.println("\n RIMOZIONE RUOLO \n ");
+			Ruolo ruoloDaDb2 = ruoloServiceInstance.caricaSingoloElemento(7L);
+			if (ruoloDaDb2 != null) {
+				ruoloServiceInstance.rimuovi(ruoloDaDb2);
+			}
 			
 //			System.out.println("\n RIMOZIONE UTENTE \n ");
 //			Utente utenteDaDb2 = utenteServiceInstance.caricaSingoloElemento(4L);

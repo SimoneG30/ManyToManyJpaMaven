@@ -1,5 +1,7 @@
 package it.manytomanyjpamaven.model;
 
+import java.util.Objects;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -55,6 +57,19 @@ public class Ruolo {
 	@Override
 	public String toString() {
 		return "Utente [id=" + id + ", descrizione=" + descrizione + ", codice=" + codice + "]";
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Ruolo ruolo = (Ruolo) o;
+		return Objects.equals(id, ruolo.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
 	}
 	
 }

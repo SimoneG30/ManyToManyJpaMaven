@@ -6,6 +6,8 @@ import javax.persistence.EntityManager;
 
 import it.manytomanyjpamaven.dao.EntityManagerUtil;
 import it.manytomanyjpamaven.dao.RuoloDAO;
+import it.manytomanyjpamaven.dao.UtenteDAO;
+import it.manytomanyjpamaven.dao.UtenteDAOImpl;
 import it.manytomanyjpamaven.model.Ruolo;
 import it.manytomanyjpamaven.model.Utente;
 
@@ -13,7 +15,7 @@ public class RuoloServiceImpl implements RuoloService {
 
 	private RuoloDAO ruoloDAO;
 
-	private UtenteService utenteServiceInstance = MyServiceFactory.getUtenteServiceInstance(); 
+	private UtenteService utenteServiceInstance = MyServiceFactory.getUtenteServiceInstance();
 	
 	@Override
 	public List<Ruolo> listAll() throws Exception {
@@ -103,21 +105,25 @@ public class RuoloServiceImpl implements RuoloService {
 	@Override
 	public void rimuovi(Ruolo ruoloInstance) throws Exception {
 		EntityManager entityManager = EntityManagerUtil.getEntityManager();
-
+		UtenteDAO utenteDAO = new UtenteDAOImpl();
 		try {
-			
+
 			entityManager.getTransaction().begin();
 
-			ruoloDAO.setEntityManager(entityManager);
+			utenteDAO.setEntityManager(entityManager);
 
-			List<Utente> listaUtentiDb = utenteServiceInstance.cercaUtentiPerRuolo(ruoloInstance);
-			if(!listaUtentiDb.isEmpty())
+			List<Utente> listaUtentiDb = utenteDAO.findAllByRuolo(ruoloInstance);
+
+			if (!listaUtentiDb.isEmpty())
 				for (Utente utenteItem : listaUtentiDb) {
-					utenteItem.setRuoli(null);
-					utenteServiceInstance.aggiorna(utenteItem);
+
+					utenteItem.getRuoli().remove(ruoloInstance);
+					utenteDAO.update(utenteItem);
 				}
-			
-			ruoloDAO.delete(ruoloInstance);
+            ruoloDAO.setEntityManager(entityManager);
+
+            ruoloDAO.delete(ruoloInstance);
+
 
 			entityManager.getTransaction().commit();
 		} catch (Exception e) {
